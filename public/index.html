@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Synchronized YouTube Player</title>
+    <style>
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="player"></div>
+        <button onclick="playVideo()">Play</button>
+        <button onclick="pauseVideo()">Pause</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let player;
+
+        // Load YouTube IFrame API
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: '0jelxNa4dYg',
+                playerVars: {
+                    'playsinline': 1
+                }
+            });
+        }
+
+        function playVideo() {
+            socket.emit('play');
+        }
+
+        function pauseVideo() {
+            socket.emit('pause');
+        }
+
+        socket.on('playVideo', () => {
+            player.playVideo();
+        });
+
+        socket.on('pauseVideo', () => {
+            player.pauseVideo();
+        });
+    </script>
+</body>
+</html>
